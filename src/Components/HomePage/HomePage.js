@@ -1,89 +1,115 @@
 import React, { useState, useEffect } from "react"
-import { allRecipes } from "../../Data/DummyFeed"
+// import { allRecipes } from "../../Data/DummyFeed"
+// import { Link } from "react-router-dom"
 import { IoMdAddCircle } from "react-icons/io"
+import { RiPencilFill } from "react-icons/ri"
+import { AiFillDelete } from "react-icons/ai"
+import AddRecipePopup from "../AddRecipePopup/AddRecipePopup"
 
 import "./HomePage.css"
 
 const HomePage = () => {
 
+    const backendUrl = "http://localhost:4999"
+
     const [clickedOnAdd, setClickedOnAdd] = useState(false)
-    const [recipeDetails, setRecipeDetails] = useState({
-        recipeName: "",
-        ingredients: "",
-        steps: ""
-    })
-    const [ingredients, setIngredients] = useState([])
-    const [steps, setSteps] = useState([])
+    const [allRecipeDetails, setAllRecipeDetails] = useState([])
+    const [recipeAdded, setRecipeAdded] = useState(false)
+    const [currentEditRecipe, setCurrentEditRecipe] = useState({})
 
     useEffect(() => {
-        console.log(allRecipes)
-    },[])
+        fetch(backendUrl+"/api/getAllRecipes")
+        .then(data => data.json())
+        .then(json => {
+            console.log(26, json)
+            setAllRecipeDetails(json)
+        })
+    },[recipeAdded])
 
-    const handleAddRecipe = () => {
-        setClickedOnAdd(true)
+    const handleAddRecipe = (value) => {
+        setClickedOnAdd(value)
     }
 
-    const handleRecipeDetailsChange = e => {
+    const checkRecipeAdded = value => {
+        setRecipeAdded(value)
+    }
+
+    const handleRecipeEdit = (uid) => {
+        fetch(backendUrl+"/api/getCurrentRecipe?uniqueId="+uid)
+        .then(data => data.json())
+        .then(json => setCurrentEditRecipe(json))
+    }
+
+    const changeRecipeData = e => {
         let value = e.target.value
         let name = e.target.name
-        setRecipeDetails(prevValue => {
+        setCurrentEditRecipe(prev => {
             return {
-                ...prevValue,
+                ...prev,
                 [name] : value
             }
         })
     }
 
-    const handleAddIngredients = () => {
-        if(recipeDetails.ingredients.length > 0) {
-            setIngredients([...ingredients, recipeDetails.ingredients])
-            setRecipeDetails(prev => {
-                return {
-                    ...prev,
-                    ingredients : ""
-                }
-            })
-        }
-    }
-
-    const handleAddSteps = () => {
-        if(recipeDetails.steps.length > 0) {
-            setSteps([...steps, recipeDetails.steps])
-            setRecipeDetails(prev => {
-                return {
-                    ...prev,
-                    steps : ""
-                }
-            })
-        }
-    }
-
-    const handleClosePopup = () => {
-        setClickedOnAdd(false)
-        setRecipeDetails(prev => {
+    const handleDeleteIngredients = (index) =>  {
+        let data = currentEditRecipe.ingredients
+        data.splice(index, 1)
+        // console.log(64, data)
+        setCurrentEditRecipe(prev => {
             return {
                 ...prev,
-                recipeName: "",
-                ingredients: "",
-                steps: ""
+                ingredients : data
             }
         })
-        setIngredients([])
-        setSteps([])
+    }
+
+    const handleDeleteSteps = (index) => {
+        
+        let data = currentEditRecipe.steps
+        data.splice(index, 1)
+        // console.log(64, data)
+        setCurrentEditRecipe(prev => {
+            return {
+                ...prev,
+                steps : data
+            }
+        })
+    }
+
+    const handleUpdateRecipeDatabase = () => {
+        fetch(backendUrl+"/api/updateRecipe", {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                recipeName: currentEditRecipe.recipeName,
+                ingredients: currentEditRecipe.ingredients,
+                steps: currentEditRecipe.steps,
+                uniqueId: currentEditRecipe.uniqueId
+            })
+        }).then(data => data.json())
+        .then(json => {
+            console.log(json)
+            setRecipeAdded(true)
+        })
+        setRecipeAdded(false)
+        setCurrentEditRecipe({})
     }
 
     return (
-        <div>
+        <div className="allRecipes-root">
             <div className="allRecipes-main">
                 <p>All recipes</p>
                 <div className="allRecipes-div">
-                    { allRecipes &&  allRecipes.map((recipe, index) => {
+                    { allRecipeDetails.length>0 &&  allRecipeDetails.map((recipe, index) => {
                         return (
-                            <div className="singleRecipe-div" key={index}>
-                                <p className="singleRecipe-name">{ recipe.name }</p>
+                            <div className="singleRecipe-div" key={recipe.uniqueId}>
+                                <p className="singleRecipe-name">{ recipe.recipeName }</p>
                                 <p className="singleRecipe-otherPTags">Ingredients: </p>
                                 <ul className="singleRecipe-ingredients">
-                                    { recipe && recipe.Ingredients.map((item, ingredientIndex) => {
+                                    { recipe.ingredients.map((item, ingredientIndex) => {
                                         return (
                                             <li key={ingredientIndex}>{item}</li>
                                         )
@@ -91,83 +117,52 @@ const HomePage = () => {
                                 </ul>
                                 <p className="singleRecipe-otherPTags">Steps to prepare</p>
                                 <ul className="singleRecipe-steps">
-                                    { recipe && recipe.Steps.map((item, stepsIndex) => {
+                                    { recipe.steps.map((item, stepsIndex) => {
                                         return (
                                             <li key={stepsIndex}>{item}</li>
                                         )
                                     }) }
                                 </ul>
-                                <p className="singleRecipe-otherPTags">Chef: <span className="singleRecipe-chef">{ recipe.chef }</span></p>
+                                <p className="singleRecipe-otherPTags">Chef: <span className="singleRecipe-chef">{ recipe.chefName }</span></p>
+                                <RiPencilFill className="allRecipes-editIcon" onClick={() => handleRecipeEdit(recipe.uniqueId)}/>
                             </div>
                         )
                     }) }
                 </div>
             </div>
             <div>
-                <IoMdAddCircle  className="homepage-addIcon" onClick={handleAddRecipe}/>
+                <IoMdAddCircle  className="homepage-addIcon" onClick={() => handleAddRecipe(true)}/>
             </div>
-
-            { clickedOnAdd && 
-                <div className="addRecipe-popup">
-                    <p>Add a recipe</p>
-                    <div className="addRecipe-content">
-                        <div className="addRecipe-form">
-                            <div className="addRecipe-name">
-                                <p>Recipe Name</p>
-                                <input type="text" onChange={handleRecipeDetailsChange} name="recipeName" value={recipeDetails.recipeName}/>
-                            </div>
-                            <div className="addRecipe-items">
-                                <p>Items</p>
-                                <div className="addRecipe-items-inline">
-                                    <input type="text" onChange={handleRecipeDetailsChange} name="ingredients" value={recipeDetails.ingredients}/>
-                                    <button onClick={handleAddIngredients}>Add</button>
-                                </div>
-                            </div>
-                            <div className="addRecipe-steps">
-                                <p>Steps</p>
-                                <div className="addRecipe-items-inline">
-                                    <input type="text" onChange={handleRecipeDetailsChange} name="steps" value={recipeDetails.steps}/>
-                                    <button onClick={handleAddSteps}>Add</button>
-                                </div>
-                            </div>
-                            <button className="addRecipe-addButton">Add this recipe</button>
-                        </div>
-                        <div className="addRecipe-preview">
-                            { (recipeDetails.recipeName.length === 0 && ingredients.length === 0  && steps.length === 0)  && 
-                                <p className="addRecipe-preview-header">Preview</p> 
-                            }
-                            { recipeDetails.recipeName.length > 0  && 
-                                <p className="singleRecipe-name preview-Name">{ recipeDetails.recipeName }</p>
-                            }
-                            { ingredients.length > 0  && 
-                                <div className="preview-ingredients">
-                                    <p className="singleRecipe-otherPTags">Ingredients: </p>
-                                    <ul className="singleRecipe-ingredients">
-                                        { ingredients.map((item, ingredientIndex) => {
-                                            return (
-                                                <li key={ingredientIndex}>{item}</li>
-                                            )
-                                        }) }
-                                    </ul>
-                                </div>
-                            }
-                            { steps.length > 0 &&
-                                <>
-                                    <p className="singleRecipe-otherPTags">Steps to prepare</p>
-                                    <ul className="singleRecipe-steps">
-                                        { steps.map((item, stepsIndex) => {
-                                            return (
-                                                <li key={stepsIndex}>{item}</li>
-                                            )
-                                        }) }
-                                    </ul>
-                                </>
-                            }
-                        </div>
+             <AddRecipePopup clickedOnAdd={clickedOnAdd} checkRecipeAdded={checkRecipeAdded} handleAddRecipe={handleAddRecipe}/>
+             { Object.keys(currentEditRecipe).length>0  && 
+                <div className="handleEditPopup">
+                    <div className="handleEditPopup-content">
+                        <p>Recipe Name</p>
+                        <input type="text" value={currentEditRecipe.recipeName} onChange={changeRecipeData} name="recipeName"/>
                     </div>
-                    <p class="popup-close" onClick={handleClosePopup}>Close</p>
-                </div> 
-            }
+                    <div>
+                        <p>Ingredients</p>
+                        <ul>
+                            { currentEditRecipe.ingredients.map((item, index) => {
+                                return (
+                                    <li key={index}>{item}<span className="deleteIcon"><AiFillDelete onClick={() => handleDeleteIngredients(index)}/></span></li>
+                                )
+                            }) }
+                        </ul>
+                    </div>
+                    <div>
+                        <p>Steps</p>
+                        <ul>
+                            { currentEditRecipe.steps.map((item, index) => {
+                                return (
+                                    <li key={index}>{item}<span className="deleteIcon"><AiFillDelete onClick={() => handleDeleteSteps(index)}/></span></li>
+                                )
+                            }) }
+                        </ul>
+                    </div>
+                    <button className="editRecipeConfirm" onClick={handleUpdateRecipeDatabase}>Confirm changes</button>
+                </div>
+             }
         </div>
     )
 }
