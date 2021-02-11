@@ -32,8 +32,10 @@
     padding: 10px 0 0 0;
     outline: none;
     font-size: 16px;
-    width: 100%;
-    font-family: 'Merienda', cursive;
+    width: 120%;
+    font-family: 'Noto Sans JP', sans-serif;
+    background-color: #ebf2ea;
+    letter-spacing: 0.5px;
 }
 
 ::placeholder {
@@ -53,4 +55,5 @@
     background-color: var(--peachCrayola);
     color: var(--eagleGreen);
     /* width: 15%; */
+    margin-left: 4%;
 }

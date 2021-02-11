@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 // import { allRecipes } from "../../Data/DummyFeed"
-// import { Link } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { IoMdAddCircle } from "react-icons/io"
 import { RiPencilFill } from "react-icons/ri"
 import { AiFillDelete } from "react-icons/ai"
@@ -8,7 +8,7 @@ import AddRecipePopup from "../AddRecipePopup/AddRecipePopup"
 
 import "./HomePage.css"
 
-const HomePage = () => {
+const HomePage = (props) => {
 
     const backendUrl = "http://localhost:4999"
 
@@ -16,6 +16,9 @@ const HomePage = () => {
     const [allRecipeDetails, setAllRecipeDetails] = useState([])
     const [recipeAdded, setRecipeAdded] = useState(false)
     const [currentEditRecipe, setCurrentEditRecipe] = useState({})
+    const loggedIn = props.location.viaLogin
+
+    useEffect(() => console.log(loggedIn),[])
 
     useEffect(() => {
         fetch(backendUrl+"/api/getAllRecipes")
@@ -102,7 +105,7 @@ const HomePage = () => {
         <div className="allRecipes-root">
             <div className="allRecipes-main">
                 <p>All recipes</p>
-                <div className="allRecipes-div">
+                {loggedIn ? <div className="allRecipes-div">
                     { allRecipeDetails.length>0 &&  allRecipeDetails.map((recipe, index) => {
                         return (
                             <div className="singleRecipe-div" key={recipe.uniqueId}>
@@ -129,9 +132,11 @@ const HomePage = () => {
                         )
                     }) }
                 </div>
+                :
+                <p style={{marginTop:'15%', fontSize:'20px', fontFamily:"'Noto Sans JP', sans-serif"}}>Please login from <Link to="/login">here</Link> </p>}
             </div>
             <div>
-                <IoMdAddCircle  className="homepage-addIcon" onClick={() => handleAddRecipe(true)}/>
+                {loggedIn && <IoMdAddCircle  className="homepage-addIcon" onClick={() => handleAddRecipe(true)}/>}
             </div>
              <AddRecipePopup clickedOnAdd={clickedOnAdd} checkRecipeAdded={checkRecipeAdded} handleAddRecipe={handleAddRecipe}/>
              { Object.keys(currentEditRecipe).length>0  && 
