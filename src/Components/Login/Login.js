@@ -53,7 +53,7 @@ const Login = (props) => {
 
             let data = {
                 token : json.token,
-                expiry : new Date().getTime()+30000 // adding 5 mins as expiry
+                expiry : new Date().getTime()+300000 // adding 5 mins as expiry
             }
 
             localStorage.setItem('authToken', JSON.stringify(data))

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, createRef } from "react"
 // import { allRecipes } from "../../Data/DummyFeed"
 import { Link } from "react-router-dom"
 import { IoMdAddCircle } from "react-icons/io"
@@ -21,21 +21,26 @@ const HomePage = (props) => {
     const [addNewIngredient, setAddNewIngredient] = useState("")
 
 
-    const tokenFromLocalStorage = JSON.parse(localStorage['authToken']).expiry > new Date().getTime() ? JSON.parse(localStorage['authToken']).authToken : ""
+    const tokenFromLocalStorage = createRef(null);
+    const authToken = createRef(null)
+    
+    useEffect(() => {
+        tokenFromLocalStorage.current = JSON.parse(localStorage['authToken']).expiry > new Date().getTime() ? JSON.parse(localStorage['authToken']).token : ""
+        authToken.current = tokenFromLocalStorage.current || props.location.jwtAuthToken
+    },[])
 
-    const authToken = props.location.jwtAuthToken || tokenFromLocalStorage
-
+    
     // useEffect(() => console.log(loggedIn),[])
 
     useEffect(() => {
+        console.log(39, authToken.current)
         fetch(backendUrl+"/api/getAllRecipes",{
             headers:{
-                authorization: "Bearer "+authToken
+                authorization: "Bearer "+authToken.current
             }
         })
         .then(data => data.json())
         .then(json => {
-            console.log(26, json)
             setAllRecipeDetails(json.data)
         })
     },[recipeAdded])
@@ -49,9 +54,15 @@ const HomePage = (props) => {
     }
 
     const handleRecipeEdit = (uid) => {
-        fetch(backendUrl+"/api/getCurrentRecipe?uniqueId="+uid)
-        .then(data => data.json())
-        .then(json => setCurrentEditRecipe(json))
+        console.log(authToken, 58)
+        if(JSON.parse(localStorage['authToken']).expiry > new Date().getTime()) {
+            fetch(backendUrl+"/api/getCurrentRecipe?uniqueId="+uid)
+            .then(data => data.json())
+            .then(json => setCurrentEditRecipe(json))
+        } else {
+            alert("sign in again")
+        }
+        
     }
 
     const changeRecipeData = e => {
@@ -149,7 +160,8 @@ const HomePage = (props) => {
         <div className="allRecipes-root">
             <div className="allRecipes-main">
                 <p>All recipes</p>
-                {(authToken && authToken.length > 0) ? <div className="allRecipes-div">
+                {/* {(allRecipeDetails && allRecipeDetails.length>0) && JSON.stringify(authToken.current)} */}
+                {(allRecipeDetails && allRecipeDetails.length>0) ? <div className="allRecipes-div">
                     { allRecipeDetails.length>0 &&  allRecipeDetails.map((recipe, index) => {
                         return (
                             <div className="singleRecipe-div" key={recipe.uniqueId}>
@@ -180,7 +192,7 @@ const HomePage = (props) => {
                 <p style={{marginTop:'15%', fontSize:'20px', fontFamily:"'Noto Sans JP', sans-serif"}}>Please login from <Link to="/login">here</Link> </p>}
             </div>
             <div>
-                {(authToken && authToken.length > 0) && <IoMdAddCircle  className="homepage-addIcon" onClick={() => handleAddRecipe(true)}/>}
+                {(allRecipeDetails && allRecipeDetails.length>0) && <IoMdAddCircle  className="homepage-addIcon" onClick={() => handleAddRecipe(true)}/>}
             </div>
              <AddRecipePopup clickedOnAdd={clickedOnAdd} checkRecipeAdded={checkRecipeAdded} handleAddRecipe={handleAddRecipe}/>
              { Object.keys(currentEditRecipe).length>0  && 
