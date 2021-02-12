@@ -139,3 +139,10 @@
     border: none;
     cursor: pointer;
 }
+
+.editRecipeClose {
+    position: relative;
+    top: -115px;
+    right: -120%;
+    cursor: pointer;
+}

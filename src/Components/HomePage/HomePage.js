@@ -195,9 +195,10 @@ const HomePage = (props) => {
                 {(allRecipeDetails && allRecipeDetails.length>0) && <IoMdAddCircle  className="homepage-addIcon" onClick={() => handleAddRecipe(true)}/>}
             </div>
              <AddRecipePopup clickedOnAdd={clickedOnAdd} checkRecipeAdded={checkRecipeAdded} handleAddRecipe={handleAddRecipe}/>
-             { Object.keys(currentEditRecipe).length>0  && 
+             { (Object.keys(currentEditRecipe).length>0 && (allRecipeDetails && allRecipeDetails.length>0))  && 
                 <div className="handleEditPopup">
                     <p className="editRecipeHeader">Editing the recipe</p>
+                    <p className="editRecipeClose" onClick={() => setCurrentEditRecipe({})}>Close</p>
                     <div className="handleEditPopup-data">
                         <div className="handleEditPopup-content">
                             <p>Recipe Name</p>
