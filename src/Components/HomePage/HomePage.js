@@ -16,16 +16,27 @@ const HomePage = (props) => {
     const [allRecipeDetails, setAllRecipeDetails] = useState([])
     const [recipeAdded, setRecipeAdded] = useState(false)
     const [currentEditRecipe, setCurrentEditRecipe] = useState({})
-    const loggedIn = props.location.viaLogin
+    
+    const [addNewStep, setAddNewStep] = useState("")
+    const [addNewIngredient, setAddNewIngredient] = useState("")
 
-    useEffect(() => console.log(loggedIn),[])
+
+    const tokenFromLocalStorage = JSON.parse(localStorage['authToken']).expiry > new Date().getTime() ? JSON.parse(localStorage['authToken']).authToken : ""
+
+    const authToken = props.location.jwtAuthToken || tokenFromLocalStorage
+
+    // useEffect(() => console.log(loggedIn),[])
 
     useEffect(() => {
-        fetch(backendUrl+"/api/getAllRecipes")
+        fetch(backendUrl+"/api/getAllRecipes",{
+            headers:{
+                authorization: "Bearer "+authToken
+            }
+        })
         .then(data => data.json())
         .then(json => {
             console.log(26, json)
-            setAllRecipeDetails(json)
+            setAllRecipeDetails(json.data)
         })
     },[recipeAdded])
 
@@ -101,11 +112,44 @@ const HomePage = (props) => {
         setCurrentEditRecipe({})
     }
 
+    //Adding a new step to the recipe
+    const handleNewStepChange = e => {
+        let value = e.target.value
+        setAddNewStep(value)
+    }
+
+    const handleAddNewStep = () => {
+        setCurrentEditRecipe(prev => {
+            return {
+                ...prev,
+                steps: [...currentEditRecipe.steps, addNewStep]
+            }
+        })
+        setAddNewStep("")
+    }
+
+
+    //Adding a new ingredient to the recipe
+    const handleNewIngredientChange = e => {
+        let value = e.target.value
+        setAddNewIngredient(value)
+    }
+
+    const handleAddIngredient = () => {
+        setCurrentEditRecipe(prev => {
+            return {
+                ...prev,
+                ingredients: [...currentEditRecipe.ingredients, addNewIngredient]
+            }
+        })
+        setAddNewIngredient("")
+    }
+
     return (
         <div className="allRecipes-root">
             <div className="allRecipes-main">
                 <p>All recipes</p>
-                {loggedIn ? <div className="allRecipes-div">
+                {(authToken && authToken.length > 0) ? <div className="allRecipes-div">
                     { allRecipeDetails.length>0 &&  allRecipeDetails.map((recipe, index) => {
                         return (
                             <div className="singleRecipe-div" key={recipe.uniqueId}>
@@ -136,36 +180,43 @@ const HomePage = (props) => {
                 <p style={{marginTop:'15%', fontSize:'20px', fontFamily:"'Noto Sans JP', sans-serif"}}>Please login from <Link to="/login">here</Link> </p>}
             </div>
             <div>
-                {loggedIn && <IoMdAddCircle  className="homepage-addIcon" onClick={() => handleAddRecipe(true)}/>}
+                {(authToken && authToken.length > 0) && <IoMdAddCircle  className="homepage-addIcon" onClick={() => handleAddRecipe(true)}/>}
             </div>
              <AddRecipePopup clickedOnAdd={clickedOnAdd} checkRecipeAdded={checkRecipeAdded} handleAddRecipe={handleAddRecipe}/>
              { Object.keys(currentEditRecipe).length>0  && 
                 <div className="handleEditPopup">
-                    <div className="handleEditPopup-content">
-                        <p>Recipe Name</p>
-                        <input type="text" value={currentEditRecipe.recipeName} onChange={changeRecipeData} name="recipeName"/>
+                    <p className="editRecipeHeader">Editing the recipe</p>
+                    <div className="handleEditPopup-data">
+                        <div className="handleEditPopup-content">
+                            <p>Recipe Name</p>
+                            <input type="text" value={currentEditRecipe.recipeName} onChange={changeRecipeData} name="recipeName"/>
+                        </div>
+                        <div>
+                            <p>Ingredients</p>
+                            <input type="text" onChange={handleNewIngredientChange} value={addNewIngredient}/>
+                            <button onClick={handleAddIngredient} className="editRecipe-AddButtons"><IoMdAddCircle/></button>
+                            <ul>
+                                { currentEditRecipe.ingredients.map((item, index) => {
+                                    return (
+                                        <li key={index}>{item}<span className="deleteIcon"><AiFillDelete onClick={() => handleDeleteIngredients(index)}/></span></li>
+                                    )
+                                }) }
+                            </ul>
+                        </div>
+                        <div>
+                            <p>Steps</p>
+                            <input type="text" onChange={handleNewStepChange} value={addNewStep}/>
+                            <button onClick={handleAddNewStep} className="editRecipe-AddButtons"><IoMdAddCircle /></button>
+                            <ul>
+                                { currentEditRecipe.steps.map((item, index) => {
+                                    return (
+                                        <li key={index}>{item}<span className="deleteIcon"><AiFillDelete onClick={() => handleDeleteSteps(index)}/></span></li>
+                                    )
+                                }) }
+                            </ul>
+                        </div>
+                        <button className="editRecipeConfirm" onClick={handleUpdateRecipeDatabase}>Confirm changes</button>
                     </div>
-                    <div>
-                        <p>Ingredients</p>
-                        <ul>
-                            { currentEditRecipe.ingredients.map((item, index) => {
-                                return (
-                                    <li key={index}>{item}<span className="deleteIcon"><AiFillDelete onClick={() => handleDeleteIngredients(index)}/></span></li>
-                                )
-                            }) }
-                        </ul>
-                    </div>
-                    <div>
-                        <p>Steps</p>
-                        <ul>
-                            { currentEditRecipe.steps.map((item, index) => {
-                                return (
-                                    <li key={index}>{item}<span className="deleteIcon"><AiFillDelete onClick={() => handleDeleteSteps(index)}/></span></li>
-                                )
-                            }) }
-                        </ul>
-                    </div>
-                    <button className="editRecipeConfirm" onClick={handleUpdateRecipeDatabase}>Confirm changes</button>
                 </div>
              }
         </div>

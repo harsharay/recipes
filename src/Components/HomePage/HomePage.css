@@ -59,116 +59,6 @@
     cursor: pointer;
 }
 
-.addRecipe-popup {
-    position: absolute;
-    top: 20%;
-    left: 25%;
-    z-index: 10;
-    height: fit-content;
-    width: 50vw;
-    padding: 0 0 40px 0;
-    /* border: 2px solid red; */
-    color: #415375;
-    background-color: #f1c4c1;
-    border-radius: 10px;
-    transition: opacity 0.2s 1s ease;
-    /* display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center; */
-    box-sizing: border-box;
-    font-weight: 600;
-}
-
-.addRecipe-popup > p {
-    font-size: 14px;
-    font-family: 'Merienda', cursive;
-    font-weight: 900;
-    letter-spacing: 0.5px;
-}
-
-.addRecipe-content {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-}
-
-.addRecipe-form {
-    text-align: left;
-    width: 30%;
-    height: 100%;
-    /* border: 2px solid #5c80bc; */
-    padding: 0 5%;
-    border-right: 2px solid white;
-    /* position: static; */
-}
-
-.addRecipe-form input {
-    padding: 10px;
-    outline: none;
-    border-radius: 5px;
-    border: none;
-}
-
-.addRecipe-items-inline {
-    display: inline-block;
-}
-
-.addRecipe-items-inline button {
-    padding: 7px;
-    outline: none;
-    font-size: 16px;
-    border-radius: 5px;
-    background-color: #f1c4c1;
-    border: 0;
-    color: #35477a;
-    cursor: pointer;
-}
-
-.addRecipe-addButton {
-    padding: 3% 7%;
-    margin-top: 15%;
-    margin-left: 10%;
-    font-family: 'Noto Sans JP', sans-serif;
-    font-weight: 900;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    background-color: #2f3d64;
-    color: white;
-    border: none;
-}
-
-.addRecipe-preview {
-    width: 70%;
-    height: fit-content;
-    /* border: 2px solid blueviolet; */
-    text-align: left;
-    padding-left: 5%;
-}
-
-.addRecipe-preview-header {
-    text-align: center;
-    position: relative;
-    top: -140px;
-}
-
-.preview-Name {
-    /* position: relative;
-    top: -130px; */
-}
-
-.preview-ingredients {
-    /* position: relative; */
-    /* top: -125px; */
-}
-
-.popup-close {
-    position: absolute;
-    right: 2%;
-    top: 0px;
-    cursor: pointer;
-}
 
 .allRecipes-editIcon {
     position: relative;
@@ -183,15 +73,49 @@
     z-index: 15;
     top: 20%;
     left: 40%;
-    background-color: white;
+    color: #415375;
+    background-color: #f1c4c1;
     height: fit-content;
     width: fit-content;
     text-align: left;
-    padding: 0 1%;
+    padding: 2% 5%;
+    border-radius: 10px;
+}
+
+.handleEditPopup-data {
+    /* border: 2px solid red; */
+    width: 150%;
+}
+
+.handleEditPopup input {
+    border: 0;
+    border-bottom: 2px solid #2f3d64;
+    background-color: #f1c4c1;
+    padding: 2% 5% 0 1%;
+    outline: none;
+    font-size: 16px;
+}
+
+.editRecipeHeader {
+    font-size: 24px;
+    font-family: 'Merienda', cursive;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    position: relative;
+    top: -25px;
 }
 
 .handleEditPopup ul {
     line-height: 30px;
+}
+
+.editRecipe-AddButtons {
+    background-color: #f1c4c1;
+    color: #415375;
+    border-radius: 5px;
+    border: 0;
+    outline: none;
+    cursor: pointer;
 }
 
 .handleEditPopup ul li {
@@ -209,4 +133,9 @@
     padding: 5px 10px;
     position: relative;
     left: 15%;
+    background-color: #2f3d64;
+    color: white;
+    outline: none;
+    border: none;
+    cursor: pointer;
 }

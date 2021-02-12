@@ -10,18 +10,17 @@ const Login = (props) => {
         password: ""
     })
     const [attemptLogin, setAttemptLogin] = useState(false)
-    const [loginResponse, setLoginResponse] = useState("")
+    // const [loginResponse, setLoginResponse] = useState("")
+    const [jwtAuthToken, setJwtAuthToken] = useState("")
 
     useEffect(() => {
-        if(loginResponse==="successfull") {
+        if(jwtAuthToken.length > 0) {
             props.history.push({
                 pathname: '/home',
-                viaLogin: true
+                jwtAuthToken
             })
-        } else if(loginResponse === 'unsuccessfull'){
-            alert("Wrong username/ password")
         }
-    },[loginResponse])
+    },[jwtAuthToken])
 
     const handleEmailPasswordLogin = e => {
         let name = e.target.name
@@ -50,8 +49,15 @@ const Login = (props) => {
             })
         }).then(data => data.json())
         .then(json => {
-            setLoginResponse(json)
             setAttemptLogin(true)
+
+            let data = {
+                token : json.token,
+                expiry : new Date().getTime()+30000 // adding 5 mins as expiry
+            }
+
+            localStorage.setItem('authToken', JSON.stringify(data))
+            setJwtAuthToken(json.token)
         })
         setAttemptLogin(false)
     }
