@@ -7,7 +7,7 @@ import "./AddRecipePopup.css"
 const AddRecipePopup = ({ clickedOnAdd,checkRecipeAdded,handleAddRecipe }) => {
 
 
-    const backendUrl = "http://localhost:4999"
+    const backendUrl = "https://recipes-backend-server.herokuapp.com"
 
     const [recipeDetails, setRecipeDetails] = useState({
         recipeName: "",

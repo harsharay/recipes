@@ -10,7 +10,7 @@ import "./HomePage.css"
 
 const HomePage = (props) => {
 
-    const backendUrl = "http://localhost:4999"
+    const backendUrl = "https://recipes-backend-server.herokuapp.com"
 
     const [clickedOnAdd, setClickedOnAdd] = useState(false)
     const [allRecipeDetails, setAllRecipeDetails] = useState([])
