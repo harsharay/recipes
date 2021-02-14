@@ -1,5 +1,5 @@
 Live Demo: https://recipe-fullstack.herokuapp.com/
-Back End: https://harsharay.github.io/harsharay/recipes-backend
+Back End: https://github.com/harsharay/recipes-backend
 
 ![Website Preview](https://github.com/harsharay/recipes/blob/master/Recipe-Book.jpeg)
 
